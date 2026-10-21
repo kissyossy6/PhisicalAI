@@ -1,0 +1,7 @@
+mujoco==3.16.0
+google-genai==2.32.0
+numpy==2.4.6
+pillow==13.0.0
+imageio==2.38.1
+imageio-ffmpeg==0.6.0
+python-dotenv==1.2.4

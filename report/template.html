@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>PAI最終課題 説明資料</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm; }
+  body { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans CJK JP", sans-serif; font-size: 10.2pt; line-height: 1.65; color: #1c1f26; }
+  h1 { font-size: 19pt; margin: 0 0 2px; letter-spacing: .01em; }
+  .lead { color: #4a5060; margin: 0 0 14px; }
+  h2 { font-size: 12.5pt; border-left: 5px solid #2962ff; padding-left: 8px; margin: 20px 0 8px; break-after: avoid; }
+  h3 { font-size: 11pt; margin: 14px 0 6px; break-after: avoid; }
+  p { margin: 4px 0 8px; }
+  ul { margin: 4px 0 8px; padding-left: 1.3em; }
+  li { margin: 2px 0; }
+  table { border-collapse: collapse; font-size: 9.2pt; margin: 6px 0; }
+  th, td { border: 1px solid #d5d9e2; padding: 3px 8px; text-align: left; vertical-align: top; }
+  th { background: #f1f4fa; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  figure { margin: 0; break-inside: avoid; }
+  figure img { width: 100%; border: 1px solid #d5d9e2; border-radius: 3px; }
+  figcaption { font-size: 8.3pt; color: #4a5060; }
+  .cols { display: flex; gap: 14px; align-items: flex-start; }
+  .note { color: #333; }
+  pre { background: #f6f8fb; border: 1px solid #e1e5ec; padding: 8px 10px; font-size: 8.6pt; line-height: 1.45; white-space: pre-wrap; break-inside: avoid; }
+  .box { border: 1px solid #d5d9e2; border-radius: 6px; padding: 8px 12px; background: #fafbfd; }
+  .meta td { border: none; padding: 1px 10px 1px 0; }
+</style>
+</head>
+<body>
+<h1>ことばで片付けるロボット</h1>
+<p class="lead">Gemini Robotics-ER × MuJoCo Franka Panda ― 自然言語の指示ひとつで、机の上の物を分類して片付ける</p>
+<table class="meta">
+  <tr><td>動画</td><td>{{YOUTUBE}}</td></tr>
+  <tr><td>コード</td><td>{{GITHUB}}</td></tr>
+  <tr><td>ベースにしたサンプル</td><td>「Gemini Robotics-ER 1.6 を試す」（中級） https://note.com/npaka/n/n93116b196748</td></tr>
+</table>
+
+<h2>1. 概要と目的</h2>
+<p>家庭やオフィスで「片付けて」と頼むとき、人はいちいち物の座標や置き場所を指定しません。
+本課題では、<b>「机の上を片付けて。食べ物はお皿に、おもちゃは箱にしまってね。」という指示ひとつ</b>だけを与え、
+ロボットが自分で「何が食べ物で何がおもちゃか」「どこにあるか」「どこに置けば他の物に当たらないか」「本当に入ったか」を判断して、
+最後まで片付けきることを目指しました。</p>
+<p>ベースのサンプルは、Gemini Robotics-ER に画像を見せてポインティングや計画を出力させるところで終わっています。
+本作ではその出力を<b>シミュレータ上の実際のアームの動作につなげ</b>、さらに<b>成功判定・やり直し・再計画</b>まで含めた閉ループのシステムにしました。
+ロボットはシミュレータから物体の座標を一切受け取らず、カメラ画像（RGB と深度）だけで動きます。</p>
+
+<h2>2. システム構成</h2>
+<pre>カメラ画像（RGB-D, 800×600）
+ ① 計画       Gemini: 指示＋画像 → 物体の一覧・分類・行き先・手順          （タスクオーケストレーション, thinking 2048）
+ ── 各ステップ ─────────────────────────────────────────
+ ② 物体の位置  Gemini: 「red cube はどこ？」→ 2D 点 [y, x]                     （2D ポインティング）
+              → 深度で 3D に逆投影し、周りの点群から中心・高さ・向きを補正       （幾何処理）
+ ③ 置き場所    Gemini: 容器の中の「空いている場所」を 1 点で指す                 （空間推論, thinking 512）
+ ④ 実行        IK（減衰最小二乗法）による直線軌道で つかむ → 運ぶ → 置く        （MuJoCo / Franka Panda）
+ ⑤ 確認        Gemini: 画像を見て成功か判定。失敗なら位置を取り直してやり直す      （成功判定）
+ ─────────────────────────────────────────────────
+ 最後にもう一度画像を見て再計画。やり残しがあれば続け、なければ終了</pre>
+<table>
+  <tr><th>役割</th><th>担当</th></tr>
+  <tr><td>何を・どこへ・どの順で（意味の理解）</td><td>Gemini Robotics-ER（plan）</td></tr>
+  <tr><td>物体は画像のどこか</td><td>Gemini Robotics-ER（point）</td></tr>
+  <tr><td>正確な 3D 位置・つかむ向き</td><td>深度画像の幾何処理（<code>sim/env.py: refine_grasp</code>）</td></tr>
+  <tr><td>容器のどこに置くか</td><td>Gemini Robotics-ER（free_spot）</td></tr>
+  <tr><td>動かし方</td><td>IK と動作プリミティブ（<code>sim/env.py</code>）</td></tr>
+  <tr><td>うまくいったか</td><td>Gemini Robotics-ER（verify）＋グリッパの開き幅</td></tr>
+</table>
+<p>使用ツール: MuJoCo 3.16（物理シミュレータ）、Franka Emika Panda（MuJoCo Menagerie のモデル）、
+Gemini API（<code>gemini-robotics-er-2-preview</code>）、Python 3.11。学習は行わず、推論のみを使っています。</p>
+
+<h2>3. 工夫した点</h2>
+<ul>
+  <li><b>「意味」は AI、「精度」は幾何、と役割を分けた。</b>Gemini の 2D 点は「どの物か」を決めるのには十分正確ですが、
+  そのまま 3D にすると物体の表面（カメラ側の側面）を指してしまい、把持位置が数 mm〜1 cm ずれます。そこで Gemini の点を種にして、
+  深度画像から机より高い点だけを集め、上面の重心を中心に、最小外接矩形の角度を向きにしました。
+  正解座標と比べた推定誤差は数 mm 程度で、制御部分だけを確かめる事前テスト（2D 点に正解を与え、ランダムな配置 3 通り × 6 物体）では 18/18 回つかんで運べました。</li>
+  <li><b>つかむ直前に必ず見直す。</b>最初の計画の座標は使い回さず、各ステップの直前に画像を取り直して物の位置を聞き直します。
+  前の動作で物が少しずれても、人が動かしても対応できます。</li>
+  <li><b>置き場所も AI に選ばせる。</b>容器の中心に毎回置くと物が重なり、球の果物は転がって皿からはみ出すことがありました。Gemini に「既に置いた物と縁に当たらない空いている場所」を
+  指させ、その点が容器から外れる場合だけ内側に収めるようにしました。</li>
+  <li><b>確認・やり直し・再計画の閉ループ。</b>つかみ損ねはグリッパの開き幅で、置き損ねは Gemini の画像による成功判定で検出し、やり直します。
+  全ステップの後にもう一度シーンを見て計画し直すので、<b>途中で人が片付けた物を机に戻しても、最後に気づいて片付け直します</b>（動画の後半）。</li>
+  <li><b>説明が分かる動画。</b>本体の映像に、Gemini が見ている画像と出力（点・矢印・判定）を右上に重ね、
+  いま何をしているか（①計画〜⑤確認）を字幕で出しました。物体の座標は使っていないことも冒頭で示しています。</li>
+  <li><b>実機に近づけるための配慮。</b>シミュレータの正解座標は評価にしか使っていません。入力は 1 台の RGB-D カメラだけなので、
+  実機（例: RealSense＋アーム）でも同じ構成で動かせる見込みです。</li>
+</ul>
+
+<h2>4. 結果</h2>
+{{RUNS}}
+
+<h2>5. つまずいた点と考察</h2>
+<ul>
+  <li><b>物理の落とし穴。</b>最初はりんごが勝手に転がっていました。ヘタと葉の質量で重心がずれていたためで、慣性を中心に明示し、
+  果物に転がり摩擦を付けて直しました。また、待機姿勢から把持位置へ関節空間で直接補間すると、アームが机すれすれを通って物を押し出していました。
+  いったん安全な高さを経由するようにして解決しました。</li>
+  <li><b>モデルの世代交代。</b>記事の <code>gemini-robotics-er-1.6-preview</code> は、2026年10月時点で API の提供が終わっていました。
+  後継の <code>gemini-robotics-er-2-preview</code> で同じプロンプト形式（[y, x] を 0〜1000 に正規化）がそのまま使えました。</li>
+  <li><b>レート制限と呼び出しの統合。</b>無料枠は毎分 5 回・1 日 20 回までで、最初の版（1 物体につき「位置」「置き場所」「確認」の 3 回）では 1 日 1 回も完走できませんでした。
+  そこで「前のステップは成功したか」「次の物はどこか」「容器のどこが空いているか」を<b>1 回の呼び出しでまとめて聞く</b>形に変え、1 回の実行を約 10 回に減らしました。
+  最後のステップの確認は、最後の再計画が兼ねます。毎分の制限で 429 が返ったときは、サーバーが指定する秒数だけ待ちます。
+  待っている間はシミュレーションも止まるので、動画の中の動きは実時間のままです（応答待ちの時間は動画から除いています）。</li>
+  <li><b>今後の課題。</b>現在は真上からつかむ動作だけで、平らな物や重なった物には対応していません。
+  Gemini の軌道出力（記事の「軌跡」）を使った障害物回避や、把持点を 2 点で指させる把持姿勢の推定を加えると、より複雑な片付けに広げられます。
+</li>
+</ul>
+</body>
+</html>

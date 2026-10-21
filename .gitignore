@@ -1,0 +1,10 @@
+.venv/
+.env
+out/
+third_party/
+__pycache__/
+*.pyc
+runs/*/frames/
+MUJOCO_LOG.TXT
+runs/
+report/report.html
