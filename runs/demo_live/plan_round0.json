@@ -1,0 +1,107 @@
+{
+  "summary_ja": "食べ物（レモン、リンゴ、オレンジ）をお皿に、おもちゃ（青、赤、緑のブロック）を箱に片付けます。",
+  "items": [
+    {
+      "label": "lemon",
+      "point": [
+        427,
+        378
+      ],
+      "category": "food",
+      "destination": "white plate",
+      "reason_ja": "食べ物なのでお皿に置きます"
+    },
+    {
+      "label": "apple",
+      "point": [
+        445,
+        444
+      ],
+      "category": "food",
+      "destination": "white plate",
+      "reason_ja": "食べ物なのでお皿に置きます"
+    },
+    {
+      "label": "orange",
+      "point": [
+        398,
+        526
+      ],
+      "category": "food",
+      "destination": "white plate",
+      "reason_ja": "食べ物なのでお皿に置きます"
+    },
+    {
+      "label": "blue cube",
+      "point": [
+        498,
+        548
+      ],
+      "category": "toy",
+      "destination": "orange toy box",
+      "reason_ja": "おもちゃなので箱にしまいます"
+    },
+    {
+      "label": "red cube",
+      "point": [
+        570,
+        518
+      ],
+      "category": "toy",
+      "destination": "orange toy box",
+      "reason_ja": "おもちゃなので箱にしまいます"
+    },
+    {
+      "label": "green cube",
+      "point": [
+        562,
+        640
+      ],
+      "category": "toy",
+      "destination": "orange toy box",
+      "reason_ja": "おもちゃなので箱にしまいます"
+    }
+  ],
+  "destinations": [
+    {
+      "label": "white plate",
+      "point": [
+        500,
+        233
+      ]
+    },
+    {
+      "label": "orange toy box",
+      "point": [
+        488,
+        778
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "object": "lemon",
+      "destination": "white plate"
+    },
+    {
+      "object": "apple",
+      "destination": "white plate"
+    },
+    {
+      "object": "orange",
+      "destination": "white plate"
+    },
+    {
+      "object": "blue cube",
+      "destination": "orange toy box"
+    },
+    {
+      "object": "red cube",
+      "destination": "orange toy box"
+    },
+    {
+      "object": "green cube",
+      "destination": "orange toy box"
+    }
+  ]
+}

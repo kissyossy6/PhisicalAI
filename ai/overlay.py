@@ -111,7 +111,7 @@ def compose_frame(main: np.ndarray, pip: Image.Image | None, title: str, caption
         bg = Image.new("RGBA", frame.size, (0, 0, 0, 0))
         bd = ImageDraw.Draw(bg)
         bd.rounded_rectangle([x0 - 4, y0 - 4, x0 + pw + 4, y0 + ph + 34], 8, fill=(15, 18, 30, 220))
-        bd.text((x0 + 6, y0 + ph + 4), "Gemini Robotics-ER 1.6 が見ている画像", font=font(17, "bold"), fill=WHITE)
+        bd.text((x0 + 6, y0 + ph + 4), "Gemini Robotics-ER が見ている画像", font=font(17, "bold"), fill=WHITE)
         frame = Image.alpha_composite(frame, bg)
         frame.paste(p, (x0, y0))
     return np.asarray(frame.convert("RGB"))

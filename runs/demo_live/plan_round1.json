@@ -1,0 +1,37 @@
+{
+  "summary_ja": "机の上の食べ物（リンゴ）をお皿に移動し、すでにお皿や箱に入っているものはそのままにします。",
+  "items": [
+    {
+      "label": "apple",
+      "point": [
+        633,
+        515
+      ],
+      "category": "food",
+      "destination": "white plate",
+      "reason_ja": "リンゴは食べ物なのでお皿に移動します。"
+    }
+  ],
+  "destinations": [
+    {
+      "label": "white plate",
+      "point": [
+        500,
+        233
+      ]
+    },
+    {
+      "label": "orange toy box",
+      "point": [
+        488,
+        779
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "object": "apple",
+      "destination": "white plate"
+    }
+  ]
+}

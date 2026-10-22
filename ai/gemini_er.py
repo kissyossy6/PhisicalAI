@@ -170,3 +170,22 @@ class GeminiER:
             Look carefully. Is the {obj} now resting inside the {container}?
             Answer only with JSON: {{"success": true or false, "reason_ja": "<short Japanese reason>"}}""")
         return self._ask("verify", img, prompt, thinking_budget=512)
+
+
+class ReplayER(GeminiER):
+    """Feeds back the responses recorded in a previous run's log.json, in order.
+
+    The simulation is deterministic, so this reproduces the run exactly (used to
+    re-render the video without spending API quota). No live inference happens.
+    """
+
+    def __init__(self, log_path: str):
+        self.log = []
+        self._recorded = json.load(open(log_path))["gemini_calls"]
+
+    def _ask(self, kind, img, prompt, thinking_budget=0, retries=3):
+        rec = self._recorded[len(self.log)]
+        assert rec["kind"] == kind, f"replay diverged: expected {rec['kind']}, got {kind}"
+        parsed = parse_json(rec["response"])
+        self.log.append(Call(kind, prompt, rec["response"], rec["seconds"], parsed))
+        return parsed

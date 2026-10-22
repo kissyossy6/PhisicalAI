@@ -1,0 +1,82 @@
+{
+  "summary_ja": "食べ物はお皿に、おもちゃは箱にすでに片付けられているため、移動させる必要はありません。",
+  "items": [
+    {
+      "label": "apple",
+      "point": [
+        531,
+        214
+      ],
+      "category": "food",
+      "destination": "stay",
+      "reason_ja": "すでにお皿の上にあります"
+    },
+    {
+      "label": "lemon",
+      "point": [
+        488,
+        228
+      ],
+      "category": "food",
+      "destination": "stay",
+      "reason_ja": "すでにお皿の上にあります"
+    },
+    {
+      "label": "orange",
+      "point": [
+        458,
+        268
+      ],
+      "category": "food",
+      "destination": "stay",
+      "reason_ja": "すでにお皿の上にあります"
+    },
+    {
+      "label": "green cube",
+      "point": [
+        504,
+        739
+      ],
+      "category": "toy",
+      "destination": "stay",
+      "reason_ja": "すでに箱の中にあります"
+    },
+    {
+      "label": "blue cube",
+      "point": [
+        461,
+        767
+      ],
+      "category": "toy",
+      "destination": "stay",
+      "reason_ja": "すでに箱の中にあります"
+    },
+    {
+      "label": "red cube",
+      "point": [
+        529,
+        785
+      ],
+      "category": "toy",
+      "destination": "stay",
+      "reason_ja": "すでに箱の中にあります"
+    }
+  ],
+  "destinations": [
+    {
+      "label": "white plate",
+      "point": [
+        500,
+        233
+      ]
+    },
+    {
+      "label": "orange toy box",
+      "point": [
+        488,
+        778
+      ]
+    }
+  ],
+  "steps": []
+}

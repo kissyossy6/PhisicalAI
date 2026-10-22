@@ -1,0 +1,113 @@
+{
+  "steps": [
+    {
+      "round": 0,
+      "object": "lemon",
+      "destination": "white plate",
+      "verified": true
+    },
+    {
+      "round": 0,
+      "object": "apple",
+      "destination": "white plate",
+      "verified": true
+    },
+    {
+      "round": 0,
+      "object": "orange",
+      "destination": "white plate",
+      "verified": true
+    },
+    {
+      "round": 0,
+      "object": "blue cube",
+      "destination": "orange toy box",
+      "verified": true
+    },
+    {
+      "round": 0,
+      "object": "red cube",
+      "destination": "orange toy box",
+      "verified": true
+    },
+    {
+      "round": 0,
+      "object": "green cube",
+      "destination": "orange toy box",
+      "verified": null
+    },
+    {
+      "round": 1,
+      "object": "apple",
+      "destination": "white plate",
+      "verified": null
+    }
+  ],
+  "replans": 2,
+  "grasp_retries": 0,
+  "disturbed": "apple",
+  "ground_truth": {
+    "apple": "white plate",
+    "orange": "white plate",
+    "lemon": "white plate",
+    "red_block": "orange toy box",
+    "blue_block": "orange toy box",
+    "green_block": "orange toy box"
+  },
+  "instruction": "机の上を片付けて。食べ物はお皿に、おもちゃは箱にしまってね。",
+  "seed": 2,
+  "gemini_calls": [
+    {
+      "kind": "plan",
+      "seconds": 5.5,
+      "response": "```json\n{\n  \"summary_ja\": \"食べ物（レモン、リンゴ、オレンジ）をお皿に、おもちゃ（青、赤、緑のブロック）を箱に片付けます。\",\n  \"items\": [\n    {\"label\": \"lemon\", \"point\": [427, 378], \"category\": \"food\", \"destination\": \"white plate\", \"reason_ja\": \"食べ物なのでお皿に置きます\"},\n    {\"label\": \"apple\", \"point\": [445, 444], \"category\": \"food\", \"destination\": \"white plate\", \"reason_ja\": \"食べ物なのでお皿に置きます\"},\n    {\"label\": \"orange\", \"point\": [398, 526], \"category\": \"food\", \"destination\": \"white plate\", \"reason_ja\": \"食べ物なのでお皿に置きます\"},\n    {\"label\": \"blue cube\", \"point\": [498, 548], \"category\": \"toy\", \"destination\": \"orange toy box\", \"reason_ja\": \"おもちゃなので箱にしまいます\"},\n    {\"label\": \"red cube\", \"point\": [570, 518], \"category\": \"toy\", \"destination\": \"orange toy box\", \"reason_ja\": \"おもちゃなので箱にしまいます\"},\n    {\"label\": \"green cube\", \"point\": [562, 640], \"category\": \"toy\", \"destination\": \"orange toy box\", \"reason_ja\": \"おもちゃなので箱にしまいます\"}\n  ],\n  \"destinations\": [\n    {\"label\": \"white plate\", \"point\": [500, 233]},\n    {\"label\": \"orange toy box\", \"point\": [488, 778]}\n  ],\n  \"steps\": [\n    {\"object\": \"lemon\", \"destination\": \"white plate\"},\n    {\"object\": \"apple\", \"destination\": \"white plate\"},\n    {\"object\": \"orange\", \"destination\": \"white plate\"},\n    {\"object\": \"blue cube\", \"destination\": \"orange toy box\"},\n    {\"object\": \"red cube\", \"destination\": \"orange toy box\"},\n    {\"object\": \"green cube\", \"destination\": \"orange toy box\"}\n  ]\n}\n```"
+    },
+    {
+      "kind": "locate",
+      "seconds": 9.27,
+      "response": "```json\n{\"previous_success\": null, \"previous_reason_ja\": \"\",\n  \"object\": {\"point\": [429, 379], \"label\": \"lemon\"},\n  \"spot\": {\"point\": [500, 232], \"label\": \"spot for lemon\"}}\n```"
+    },
+    {
+      "kind": "locate",
+      "seconds": 5.15,
+      "response": "```json\n{\"previous_success\": true, \"previous_reason_ja\": \"レモンはすでに白いお皿の上に置かれています。\", \"object\": {\"point\": [446, 444], \"label\": \"apple\"}, \"spot\": {\"point\": [535, 240], \"label\": \"spot for apple\"}}\n```"
+    },
+    {
+      "kind": "locate",
+      "seconds": 3.2,
+      "response": "```json\n{\"previous_success\": true, \"previous_reason_ja\": \"リンゴは白いお皿の上に置かれています。\",\n  \"object\": {\"point\": [400, 528], \"label\": \"orange\"},\n  \"spot\": {\"point\": [475, 270], \"label\": \"spot for orange\"}}\n```"
+    },
+    {
+      "kind": "locate",
+      "seconds": 3.03,
+      "response": "```json\n{\"previous_success\": true, \"previous_reason_ja\": \"オレンジは白いお皿の上に置かれています。\",\n  \"object\": {\"point\": [498, 548], \"label\": \"blue cube\"},\n  \"spot\": {\"point\": [480, 765], \"label\": \"spot for blue cube\"}}\n```"
+    },
+    {
+      "kind": "locate",
+      "seconds": 3.18,
+      "response": "```json\n{\n  \"previous_success\": true,\n  \"previous_reason_ja\": \"青いキューブはすでにおもちゃ箱の中に正しく配置されています。\",\n  \"object\": {\n    \"point\": [568, 518],\n    \"label\": \"red cube\"\n  },\n  \"spot\": {\n    \"point\": [520, 780],\n    \"label\": \"spot for red cube\"\n  }\n}\n```"
+    },
+    {
+      "kind": "locate",
+      "seconds": 4.43,
+      "response": "```json\n{\"previous_success\": true, \"previous_reason_ja\": \"赤いキューブはオレンジ色のおもちゃ箱の中に正しく置かれています。\",\n  \"object\": {\"point\": [560, 640], \"label\": \"green cube\"},\n  \"spot\": {\"point\": [522, 735], \"label\": \"spot for green cube\"}}\n```"
+    },
+    {
+      "kind": "plan",
+      "seconds": 4.98,
+      "response": "```json\n{\n  \"summary_ja\": \"机の上の食べ物（リンゴ）をお皿に移動し、すでにお皿や箱に入っているものはそのままにします。\",\n  \"items\": [\n    {\n      \"label\": \"apple\",\n      \"point\": [633, 515],\n      \"category\": \"food\",\n      \"destination\": \"white plate\",\n      \"reason_ja\": \"リンゴは食べ物なのでお皿に移動します。\"\n    }\n  ],\n  \"destinations\": [\n    {\n      \"label\": \"white plate\",\n      \"point\": [500, 233]\n    },\n    {\n      \"label\": \"orange toy box\",\n      \"point\": [488, 779]\n    }\n  ],\n  \"steps\": [\n    {\n      \"object\": \"apple\",\n      \"destination\": \"white plate\"\n    }\n  ]\n}\n```"
+    },
+    {
+      "kind": "locate",
+      "seconds": 4.16,
+      "response": "```json\n{\"previous_success\": null, \"previous_reason_ja\": \"\",\n  \"object\": {\"point\": [632, 515], \"label\": \"apple\"},\n  \"spot\": {\"point\": [535, 220], \"label\": \"spot for apple\"}}\n```"
+    },
+    {
+      "kind": "plan",
+      "seconds": 7.69,
+      "response": "```json\n{\n  \"summary_ja\": \"食べ物はお皿に、おもちゃは箱にすでに片付けられているため、移動させる必要はありません。\",\n  \"items\": [\n    {\"label\": \"apple\", \"point\": [531, 214], \"category\": \"food\", \"destination\": \"stay\", \"reason_ja\": \"すでにお皿の上にあります\"},\n    {\"label\": \"lemon\", \"point\": [488, 228], \"category\": \"food\", \"destination\": \"stay\", \"reason_ja\": \"すでにお皿の上にあります\"},\n    {\"label\": \"orange\", \"point\": [458, 268], \"category\": \"food\", \"destination\": \"stay\", \"reason_ja\": \"すでにお皿の上にあります\"},\n    {\"label\": \"green cube\", \"point\": [504, 739], \"category\": \"toy\", \"destination\": \"stay\", \"reason_ja\": \"すでに箱の中にあります\"},\n    {\"label\": \"blue cube\", \"point\": [461, 767], \"category\": \"toy\", \"destination\": \"stay\", \"reason_ja\": \"すでに箱の中にあります\"},\n    {\"label\": \"red cube\", \"point\": [529, 785], \"category\": \"toy\", \"destination\": \"stay\", \"reason_ja\": \"すでに箱の中にあります\"}\n  ],\n  \"destinations\": [\n    {\"label\": \"white plate\", \"point\": [500, 233]},\n    {\"label\": \"orange toy box\", \"point\": [488, 778]}\n  ],\n  \"steps\": []\n}\n```"
+    }
+  ],
+  "wall_seconds": 173.2,
+  "video_seconds": 123.4
+}

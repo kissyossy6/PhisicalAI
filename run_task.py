@@ -1,4 +1,4 @@
-"""Natural-language tidy-up with Gemini Robotics-ER 1.6 + MuJoCo Franka Panda.
+"""Natural-language tidy-up with Gemini Robotics-ER + MuJoCo Franka Panda.
 
     python run_task.py --instruction "食べ物はお皿に、おもちゃは箱に片付けて" --seed 2 --disturb
 
@@ -19,7 +19,7 @@ import numpy as np
 from dotenv import load_dotenv
 from PIL import Image
 
-from ai.gemini_er import GeminiER
+from ai.gemini_er import GeminiER, ReplayER
 from ai.overlay import compose_frame, draw_badge, draw_plan, draw_points
 from sim.env import ITEM_BODIES, TidyEnv
 
@@ -28,7 +28,7 @@ CONTAINERS = {
     "white plate": (np.array([0.45, -0.38]), 0.013, 0.07),
     "orange toy box": (np.array([0.45, 0.38]), 0.008, 0.07),
 }
-TITLE = "Gemini Robotics-ER 1.6 × MuJoCo ― ことばで片付けるロボット"
+TITLE = "Gemini Robotics-ER 2 × MuJoCo ― ことばで片付けるロボット"
 
 
 def container_of(label: str) -> str | None:
@@ -89,13 +89,14 @@ def main():
     ap.add_argument("--disturb", action="store_true", help="a 'human' puts one item back on the table mid-task")
     ap.add_argument("--max-rounds", type=int, default=3)
     ap.add_argument("--out", default="runs/demo")
+    ap.add_argument("--replay", help="re-render from a recorded log.json instead of calling Gemini")
     args = ap.parse_args()
 
     load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
     os.makedirs(args.out, exist_ok=True)
     env = TidyEnv()
     env.reset(seed=args.seed)
-    gem = GeminiER()
+    gem = ReplayER(args.replay) if args.replay else GeminiER()
     director = Director(env, os.path.join(args.out, "video.mp4"), args.instruction)
     snap_id = 0
 

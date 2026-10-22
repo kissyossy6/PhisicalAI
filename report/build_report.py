@@ -60,7 +60,7 @@ def run_section(run: str) -> tuple[str, dict]:
       <table><tr><th>物体</th><th>最終的な場所（評価用の正解）</th></tr>{gt}</table>
       <table><tr><th>Gemini の呼び出し</th><th>回数</th><th>平均応答時間</th></tr>{lat}</table>
     </div>
-    <p class="note">実行したステップ {stats['steps']}（Gemini が成功と判定 {stats['ok']}）、やり直し {retries} 回、再計画 {log['replans']} 回、
+    <p class="note">実行したステップ {stats['steps']}（次のステップの前の確認で成功 {stats['ok']}、残り {stats['steps'] - stats['ok'] - sum(s["verified"] is False for s in steps)} は最後の再計画で確認）、やり直し {retries} 回、再計画 {log['replans']} 回、
     動画の長さ {stats['video']} 秒{f'。妨害で戻された物: {NAMES.get(disturbed, disturbed)}' if disturbed else ''}。</p>
     """
     return sec, stats
