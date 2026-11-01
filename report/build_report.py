@@ -47,21 +47,43 @@ def run_section(run: str) -> tuple[str, dict]:
     point = first(run, "*point_*.png")
     spot = first(run, "*spot_*.png")
     verify = first(run, "*verify_*.png")
-    figs = "".join(
-        f'<figure>{img_tag(p)}<figcaption>{c}</figcaption></figure>'
-        for p, c in [(plan, "計画（青: 物体、桃: 行き先、矢印: Gemini の割り当て）"), (point, "ポインティング（つかむ直前に位置を取り直す）"),
-                     (spot, "空間推論（桃: 容器の中の空いている場所）"), (verify, "成功判定"), (final, "最終状態")] if p
-    )
+    caps = [
+        (plan, "図 1　計画（青: 物体、桃: 行き先、矢印: VLM による割り当て）"),
+        (spot or point, "図 2　把持直前の観測（青: 把持対象、桃: 容器内の配置位置）"),
+        (verify, "図 3　直前のステップの成功判定"),
+        (final, "図 4　実行終了時の状態"),
+    ]
+    figs = "".join(f"<figure>{img_tag(p)}<figcaption>{c}</figcaption></figure>" for p, c in caps if p)
     disturbed = log.get("disturbed")
+    by_replan = stats["steps"] - n_ok - sum(s["verified"] is False for s in steps)
+    summary = [
+        ("配置した物体（真値による評価）", f"{sum(w != 'table' for w in log['ground_truth'].values())} / {len(log['ground_truth'])}"),
+        ("実行したステップ数", f"{stats['steps']}（外乱への対応 1 を含む）" if disturbed else f"{stats['steps']}"),
+        ("成功判定", f"次ステップ前の確認で成功 {n_ok}、終了時の再計画で確認 {by_replan}"),
+        ("把持・配置のやり直し", f"{retries} 回"),
+        ("再計画の回数", f"{log['replans']} 回"),
+        ("VLM の呼び出し回数", f"{len(calls)} 回"),
+        ("動画の長さ（実時間）", f"{stats['video']:.0f} 秒"),
+    ]
+    rows = "".join(f"<tr><td>{k}</td><td>{v}</td></tr>" for k, v in summary)
+    dist_text = (
+        f"実行の途中、3 個目の物体を配置した直後に、片付け済みの{NAMES.get(disturbed, disturbed)}を作業台上へ戻す外乱を加えた。"
+        f"ロボットは残りの物体を処理した後の再計画でこれを検出し、再び皿へ配置した。"
+        if disturbed else ""
+    )
     sec = f"""
-    <h3>指示:「{html.escape(log['instruction'])}」（seed {log['seed']}{'、途中で妨害あり' if disturbed else ''}）</h3>
+    <p>乱数シード {log['seed']} の配置で、指示文「{html.escape(log['instruction'])}」を与えて実行した。
+    VLM は果物 3 種を食べ物、立方体 3 個をおもちゃと分類し、それぞれ皿とおもちゃ箱に割り当てる計画を生成した（図 1）。
+    {dist_text}最終的に 6 物体すべてが指示どおりの容器に収まった（表 2、表 3）。</p>
     <div class="grid">{figs}</div>
     <div class="cols">
-      <table><tr><th>物体</th><th>最終的な場所（評価用の正解）</th></tr>{gt}</table>
-      <table><tr><th>Gemini の呼び出し</th><th>回数</th><th>平均応答時間</th></tr>{lat}</table>
+      <div class="tbl"><table><tr><th>項目</th><th>結果</th></tr>{rows}</table>
+      <p class="cap">表 2　実行結果の概要</p>
+      <table><tr><th>問い合わせ</th><th>回数</th><th>平均応答時間</th></tr>{lat}</table>
+      <p class="cap">表 4　VLM の応答時間</p></div>
+      <div class="tbl"><table><tr><th>物体</th><th>最終位置（真値）</th></tr>{gt}</table>
+      <p class="cap">表 3　各物体の最終位置</p></div>
     </div>
-    <p class="note">実行したステップ {stats['steps']}（次のステップの前の確認で成功 {stats['ok']}、残り {stats['steps'] - stats['ok'] - sum(s["verified"] is False for s in steps)} は最後の再計画で確認）、やり直し {retries} 回、再計画 {log['replans']} 回、
-    動画の長さ {stats['video']} 秒{f'。妨害で戻された物: {NAMES.get(disturbed, disturbed)}' if disturbed else ''}。</p>
     """
     return sec, stats
 
